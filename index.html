@@ -2,11 +2,59 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Mi escuela</title>
+  <title>Mini foro escolar</title>
 </head>
 <body>
-  <h1>Hola</h1>
-  <p>Bienvenido a la página de mi escuela.</p>
+  <h1>Mini Foro Escolar</h1>
+  <form id="formulario">
+    <input type="text" id="mensaje" placeholder="Escribe un mensaje" required>
+    <button type="submit">Publicar</button>
+  </form>
+
+  <h2>Mensajes:</h2>
+  <div id="mensajes"></div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-app.js";
+    import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/10.10.0/firebase-database.js";
+
+    // Tu configuración personalizada
+    const firebaseConfig = {
+      apiKey: "AIzaSyBsQS04z7E_F6X8B7s62la83D6p1L1qpos",
+      authDomain: "foro-school.firebaseapp.com",
+      projectId: "foro-school",
+      storageBucket: "foro-school.firebasestorage.app",
+      messagingSenderId: "562055897218",
+      appId: "1:562055897218:web:70cd6b1557d4dc1326549b"
+    };
+
+    // Inicializar Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const mensajesRef = ref(db, "mensajes");
+
+    const formulario = document.getElementById("formulario");
+    const mensajesDiv = document.getElementById("mensajes");
+
+    formulario.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const texto = document.getElementById("mensaje").value;
+      if (texto.trim() !== "") {
+        push(mensajesRef, { texto });
+        formulario.reset();
+      }
+    });
+
+    // Escuchar mensajes en tiempo real
+    onValue(mensajesRef, (snapshot) => {
+      mensajesDiv.innerHTML = "";
+      snapshot.forEach((childSnapshot) => {
+        const mensaje = childSnapshot.val();
+        const p = document.createElement("p");
+        p.textContent = mensaje.texto;
+        mensajesDiv.appendChild(p);
+      });
+    });
+  </script>
 </body>
 </html>
-
